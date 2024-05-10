@@ -33,80 +33,10 @@ def create_demographic_file(subjects_ids, save_file, harmo_code='noHarmo'):
         df['Group']=['patient' for subject in subjects_ids]
         df['Scanner']=['3T' for subject in subjects_ids]
         df.to_csv(save_file)
-        
-if __name__ == "__main__":
-    # parse commandline arguments
-    parser = argparse.ArgumentParser(description="Main pipeline to predict on subject with MELD classifier")
-    parser.add_argument("-id","--id",
-                        help="Subject ID.",
-                        default=None,
-                        required=False,
-                        )
-    parser.add_argument("-ids","--list_ids",
-                        default=None,
-                        help="File containing list of ids. Can be txt or csv with 'ID' column",
-                        required=False,
-                        )
-    parser.add_argument("-harmo_code","--harmo_code",
-                        default="noHarmo",
-                        help="Harmonisation code",
-                        required=False,
-                        )
-    parser.add_argument("--fastsurfer", 
-                        help="use fastsurfer instead of freesurfer", 
-                        required=False, 
-                        default=False,
-                        action="store_true",
-                        )
-    parser.add_argument("--parallelise", 
-                        help="parallelise segmentation", 
-                        required=False,
-                        default=False,
-                        action="store_true",
-                        )
-    parser.add_argument('-demos', '--demographic_file', 
-                        type=str, 
-                        help='provide the demographic files for the harmonisation',
-                        required=False,
-                        default=None,
-                        )
-    parser.add_argument('--harmo_only', 
-                        action="store_true", 
-                        help='only compute the harmonisation combat parameters, no further process',
-                        required=False,
-                        default=False,
-                        )
-    parser.add_argument('--skip_feature_extraction',
-                        action="store_true",
-                        help='Skip the segmentation and extraction of the MELD features',
-                        )
-    parser.add_argument('--no_nifti',
-                        action="store_true",
-                        default=False,
-                        help='Only predict. Does not produce prediction on native T1, nor report',
-                        )
-    parser.add_argument('--no_report',
-                        action="store_true",
-                        default=False,
-                        help='Predict and map back into native T1. Does not produce report',)
-    parser.add_argument("--debug_mode", 
-                        help="mode to debug error", 
-                        required=False,
-                        default=False,
-                        action="store_true",
-                        )
-    
 
-     
-    #write terminal output in a log
-    os.makedirs(os.path.join(MELD_DATA_PATH, 'logs'), exist_ok=True)
-    file_path=os.path.join(MELD_DATA_PATH, 'logs','MELD_pipeline_'+time.strftime('%Y-%m-%d-%H-%M-%S') + '.log')
-    sys.stdout = Logger(sys.stdout,file_path)
-    sys.stderr = Logger(sys.stderr, file_path)
-    
-    args = parser.parse_args()
+
+def run(args): 
     print(args)
-    
     #---------------------------------------------------------------------------------
     ### Create demographic file for prediction if not provided
     demographic_file_tmp = os.path.join(MELD_DATA_PATH, DEMOGRAPHIC_FEATURES_FILE)
@@ -184,3 +114,73 @@ if __name__ == "__main__":
     
     #delete demographic file
     os.remove(demographic_file_tmp)
+        
+if __name__ == "__main__":
+    # parse commandline arguments
+    parser = argparse.ArgumentParser(description="Main pipeline to predict on subject with MELD classifier")
+    parser.add_argument("-id","--id",
+                        help="Subject ID.",
+                        default=None,
+                        required=False,
+                        )
+    parser.add_argument("-ids","--list_ids",
+                        default=None,
+                        help="File containing list of ids. Can be txt or csv with 'ID' column",
+                        required=False,
+                        )
+    parser.add_argument("-harmo_code","--harmo_code",
+                        default="noHarmo",
+                        help="Harmonisation code",
+                        required=False,
+                        )
+    parser.add_argument("--fastsurfer", 
+                        help="use fastsurfer instead of freesurfer", 
+                        required=False, 
+                        default=False,
+                        action="store_true",
+                        )
+    parser.add_argument("--parallelise", 
+                        help="parallelise segmentation", 
+                        required=False,
+                        default=False,
+                        action="store_true",
+                        )
+    parser.add_argument('-demos', '--demographic_file', 
+                        type=str, 
+                        help='provide the demographic files for the harmonisation',
+                        required=False,
+                        default=None,
+                        )
+    parser.add_argument('--harmo_only', 
+                        action="store_true", 
+                        help='only compute the harmonisation combat parameters, no further process',
+                        required=False,
+                        default=False,
+                        )
+    parser.add_argument('--skip_feature_extraction',
+                        action="store_true",
+                        help='Skip the segmentation and extraction of the MELD features',
+                        )
+    parser.add_argument('--no_nifti',
+                        action="store_true",
+                        default=False,
+                        help='Only predict. Does not produce prediction on native T1, nor report',
+                        )
+    parser.add_argument('--no_report',
+                        action="store_true",
+                        default=False,
+                        help='Predict and map back into native T1. Does not produce report',)
+    parser.add_argument("--debug_mode", 
+                        help="mode to debug error", 
+                        required=False,
+                        default=False,
+                        action="store_true",
+                        )
+    #write terminal output in a log
+    os.makedirs(os.path.join(MELD_DATA_PATH, 'logs'), exist_ok=True)
+    file_path=os.path.join(MELD_DATA_PATH, 'logs','MELD_pipeline_'+time.strftime('%Y-%m-%d-%H-%M-%S') + '.log')
+    sys.stdout = Logger(sys.stdout,file_path)
+    sys.stderr = Logger(sys.stderr, file_path)
+    
+    args = parser.parse_args()
+    run(args)

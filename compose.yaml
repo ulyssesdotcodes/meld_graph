@@ -1,0 +1,30 @@
+services:
+  gui:
+    build: ./gui
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: reflex run
+    ports:
+      - "3000:3000"
+      - "8000:8000"
+    develop:
+      watch:
+        - action: sync
+          path: ./gui/meld_gui/
+          target: /app/meld_gui/
+  meld:
+    build: .
+    command: python scripts/server/server.py
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - /d/Development/meld_data/data:/data
+      - /d/Development/meld_data/license.txt:/license.txt:ro
+    develop:
+      watch:
+        - action: sync+restart
+          path: scripts/
+          target: /app/scripts/
+        - action: sync+restart
+          path: meld-graph/
+          target: /app/meld-graph/
